@@ -16,7 +16,7 @@ tokenizer = AutoTokenizer.from_pretrained("bert-base-multilingual-cased")
 
 
 # Train preprocessing: estrazioni degli embedding del dizionario
-train_df = pd.read_json("/home/grizzi/phd/Disagreement_project/Data/ConvAbuse_train.json", orient='index')
+train_df = pd.read_json("./Data/ConvAbuse_train.json", orient='index')
 train_df = preprocessing.get_dataset_labels(train_df)
 
 
