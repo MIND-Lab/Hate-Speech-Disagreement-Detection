@@ -1,3 +1,19 @@
+##################################
+#  Requirements:
+#--------------------------------
+# The same code has been executed on all the dataset
+# The actual code refers to ConvAbuse. 
+# To execute on different data, adjust the data path.
+#
+# Training data should be in a folder named "Data"
+# Data paths can be specified at lines 27 and 49
+#--------------------------------
+#  What does the code do:
+#--------------------------------
+# Estimates the best thresholds (neighborhood and predictions) on the 
+# validation dataset.
+##################################
+
 import pandas as pd
 import numpy as np
 import warnings
@@ -8,10 +24,10 @@ from Utils import preprocessing
 def get_scores(sentence_num, scores_df):
     return list(scores_df.loc[scores_df['#sample']==sentence_num, 'score'].values), list(scores_df.loc[scores_df['#sample']==sentence_num, 'token'].values)
 
-dev_df = pd.read_json("Data/ConvAbuse_dev.json", orient='index')
+dev_df = pd.read_json("./Data/ConvAbuse_dev.json", orient='index')
 dev_df = preprocessing.get_dataset_labels(dev_df)
 
-scores_df_dev= pd.read_csv('results/scores_df_dev_ConvAbuse.csv', sep='\t')
+scores_df_dev= pd.read_csv('./results/scores_df_dev_ConvAbuse.csv', sep='\t')
 
 somma_threshold_neghborhood = 0
 media_threshold_neghborhood = 0
@@ -27,27 +43,21 @@ mediana_global_best_f1 = 0
 min_global_best_f1 = 0
 
 for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0,75, 0.8, 0.85, 0.9, 0.95]:
-  #scores_df_dev['score'] = 0
+  scores_df_dev['score'] = 0
   for index, row in dev_df.iterrows():
     
     distances_df = pd.read_csv('./results/distances_ConvAbuse/dist_dev_'+str(index)+'.csv', sep='\t')
-    distances_df = distances_df[(distances_df.sim_token != 'prev') & (distances_df.sim_token != 'agent')]
-    distances_df = distances_df[(distances_df.new_token != 'prev') & (distances_df.new_token != 'agent')]
+    distances_df = distances_df[(distances_df.sim_token != 'prev') & (distances_df.sim_token != 'agent')] # specific tokens removed only from the convAbuse dataset
     closer_terms = []
 
     new_words = list(distances_df.loc[(distances_df['sim_token']=='Please')&(distances_df['sim_token_sentence_number']==1), 'new_token'])
 
-
     for i in range(0, len(new_words)):
 
       word = new_words[i]
-      #sistemato per distinguere le diverse occorrenze del termine
+      #allows distinguish multiple occurrences of a given term
       word_distances = distances_df.iloc[[len(new_words)*a+i for a in range(0, round(distances_df.shape[0]/len(new_words)) )]]
 
-      # rimesso il più vicino perchè il confronto viene fatto con il train, quindi non avrò mai il match perfetto (poi tolto ancora perchè funziona meglio)
-      #selected_neighbours = word_distances.loc[word_distances['distance']>=threshold].sort_values(by=['distance'], ascending=False)[1:]
-      
-      #nuovo: 
       selected_neighbours = word_distances.loc[(word_distances['distance']>=threshold)&(word_distances['distance']!=1)]
       
       if len(selected_neighbours.loc[selected_neighbours['token_label']==1,'distance'])>0:
@@ -61,10 +71,8 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0,75, 0.8, 0.85, 0.9, 0.95]:
 
       stimated_coordinate = pos_score - neg_score
 
-      #sistemato per avere uno score diverso se un termine compare più volte nella stessa frase
-      #nuovo: 
+      # allows different scores for multiple occurrences of a given constituent in the same sentence
       scores_df_dev.loc[scores_df_dev.loc[scores_df_dev['#sample']==index, 'score'].index[i], 'score'] = stimated_coordinate
-      #scores_df_dev.loc[(scores_df_dev['token']==word)&(scores_df_dev['#sample']==index), 'score'] = stimated_coordinate
 
   pred_somma = []
   pred_tutti_verdi = []
@@ -74,7 +82,6 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0,75, 0.8, 0.85, 0.9, 0.95]:
   for index, _ in dev_df.iterrows():
     colors_agreement = get_scores(index, scores_df_dev)[0]
 
-    #tolgo gli zero:
     colors_agreement = [i for i in colors_agreement if i != 0]
 
     if colors_agreement:
@@ -123,8 +130,6 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0,75, 0.8, 0.85, 0.9, 0.95]:
       print('MEDIA \n')
       print('THRESHOLD: '+ str(best_t_media) + '\n')
       print(classification_report(dev_df['disagreement'], [int(i>=best_t_media) for i in pred] ))
-
-
 
   best_t_mediana = 0
   best_f1_mediana = 0
