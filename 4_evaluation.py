@@ -1,3 +1,23 @@
+##################################
+#  Requirements:
+#--------------------------------
+# The same code has been executed on all the dataset
+# The actual code refers to ConvAbuse. 
+# To execute on different data, adjust the data path.
+#
+# Training data should be in a folder named "Data"
+# data paths can be specified at lines 35 and 55, 157 and 172
+#--------------------------------
+#  What does the code do:
+#--------------------------------
+# Estimates the score on the test set using the best thresholds (neighborhood 
+# and predictions) estimated on the validation dataset.
+# Make predictions with the four proposed approaches: Sum, Mean, Median, and Min
+# Save predictions and results.
+# Saving paths at lines 216 and 242
+##################################
+
+
 import pandas as pd
 import numpy as np
 import warnings
@@ -9,10 +29,10 @@ from Utils import preprocessing
 def get_scores(sentence_num, scores_df):
     return list(scores_df.loc[scores_df['#sample']==sentence_num, 'score'].values), list(scores_df.loc[scores_df['#sample']==sentence_num, 'token'].values)
 
-dev_df = pd.read_json("Data/ConvAbuse_dev.json", orient='index')
+dev_df = pd.read_json("./Data/ConvAbuse_dev.json", orient='index')
 dev_df = preprocessing.get_dataset_labels(dev_df)
 
-scores_df_dev= pd.read_csv('results/scores_df_dev_ConvAbuse.csv', sep='\t')
+scores_df_dev= pd.read_csv('./results/scores_df_dev_ConvAbuse.csv', sep='\t')
 #scores_df_dev = scores_df_dev[(scores_df_dev.token != 'prev') & (scores_df_dev.token != 'agent')]
 
 somma_threshold_neghborhood = 0
@@ -29,25 +49,21 @@ mediana_global_best_f1 = 0
 min_global_best_f1 = 0
 
 for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]:
-  #scores_df_dev['score'] = 0
+  scores_df_dev['score'] = 0
   for index, row in dev_df.iterrows():
     
     distances_df = pd.read_csv('./results/distances_ConvAbuse/dist_dev_'+str(index)+'.csv', sep='\t')
     #distances_df = distances_df[(distances_df.sim_token != 'prev') & (distances_df.sim_token != 'agent')]
-    #distances_df = distances_df[(distances_df.new_token != 'prev') & (distances_df.new_token != 'agent')]
     closer_terms = []
 
-    #SELEZIONE PAROLE SISTEMATA
     new_words = list(distances_df.loc[(distances_df['sim_token']=='Please')&(distances_df['sim_token_sentence_number']==1), 'new_token'])
 
 
     for i in range(0, len(new_words)):
 
       word = new_words[i]
-      #SISTEMATO per distinguere le diverse occorrenze del termine
       word_distances = distances_df.iloc[[len(new_words)*a+i for a in range(0, round(distances_df.shape[0]/len(new_words)) )]]
       
-      #nuovo: verifico che non ci sia il match perfetto
       selected_neighbours = word_distances.loc[(word_distances['distance']>=threshold)&(word_distances['distance']!=1)]
       
       if len(selected_neighbours.loc[selected_neighbours['token_label']==1,'distance'])>0:
@@ -60,11 +76,7 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]:
         neg_score = 0
 
       stimated_coordinate = pos_score - neg_score
-
-      #SISTEMATO per avere uno score diverso se un termine compare più volte nella stessa frase
-      #nuovo: 
       scores_df_dev.loc[scores_df_dev.loc[scores_df_dev['#sample']==index, 'score'].index[i], 'score'] = stimated_coordinate
-      #scores_df_dev.loc[(scores_df_dev['token']==word)&(scores_df_dev['#sample']==index), 'score'] = stimated_coordinate
 
   pred_somma = []
   pred_tutti_verdi = []
@@ -73,9 +85,6 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]:
 
   for index, _ in dev_df.iterrows():
     colors_agreement = get_scores(index, scores_df_dev)[0]
-
-    #tolgo gli zero:
-    #colors_agreement = [i for i in colors_agreement if i != 0]
 
     if colors_agreement:
       pred_somma.append(sum(colors_agreement))
@@ -100,8 +109,6 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]:
       somma_global_best_f1 = best_f1
       somma_threshold_neghborhood = threshold
       somma_global_best_th = best_t_somma
-      
-
 
   best_t_media = 0
   best_f1_media = 0
@@ -131,7 +138,6 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]:
       mediana_threshold_neghborhood = threshold
       mediana_global_best_th = best_t_mediana
       
-
   best_t_verdi = 0
   best_f1_verdi = 0
   pred = pred_tutti_verdi
@@ -148,13 +154,12 @@ for threshold in [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]:
       
 
 
-test_df = pd.read_json("Data/ConvAbuse_test.json", orient='index')
+test_df = pd.read_json("./Data/ConvAbuse_test.json", orient='index')
 test_df = preprocessing.get_dataset_labels(test_df)
 
-scores_df_test= pd.read_csv('results/scores_df_test_ConvAbuse.csv', sep='\t')
+scores_df_test= pd.read_csv('./results/scores_df_test_ConvAbuse.csv', sep='\t')
 
 scores_df_test['score'] = None
-#scores_df_test = scores_df_test[(scores_df_test.token != 'prev') & (scores_df_test.token != 'agent')]
 
 prediction_df = pd.DataFrame(columns=['original_text', 'disagreement', 'somma', 'media', 'mediana', 'min', 'somma_t', 'media_t', 'mediana_t', 'min_t'])
 prediction_df['original_text'] = test_df['original_text']
@@ -166,7 +171,6 @@ for threshold in [somma_threshold_neghborhood, media_threshold_neghborhood, medi
     
     distances_df = pd.read_csv('./results/distances_ConvAbuse/dist_'+str(index)+'.csv', sep='\t')
     #distances_df = distances_df[(distances_df.sim_token != 'prev') & (distances_df.sim_token != 'agent')]
-    #distances_df = distances_df[(distances_df.new_token != 'prev') & (distances_df.new_token != 'agent')]
     closer_terms = []
 
     new_words = list(distances_df.loc[(distances_df['sim_token']=='Please')&(distances_df['sim_token_sentence_number']==1), 'new_token'])
@@ -188,10 +192,7 @@ for threshold in [somma_threshold_neghborhood, media_threshold_neghborhood, medi
         neg_score = 0
 
       stimated_coordinate = pos_score - neg_score
-
-      #nuovo 
       scores_df_test.loc[scores_df_test.loc[scores_df_test['#sample']==index, 'score'].index[i], 'score'] = stimated_coordinate
-      #scores_df_test.loc[(scores_df_test['token']==word)&(scores_df_test['#sample']==index), 'score'] = stimated_coordinate
 
   pred_somma = []
   pred_media= []
@@ -200,9 +201,6 @@ for threshold in [somma_threshold_neghborhood, media_threshold_neghborhood, medi
 
   for index, _ in test_df.iterrows():
     colors_agreement = get_scores(index, scores_df_test)[0]
-
-    #tolgo gli zero:
-    #colors_agreement = [i for i in colors_agreement if i != 0]
 
     if colors_agreement:
       pred_somma.append(sum(colors_agreement))
@@ -215,17 +213,17 @@ for threshold in [somma_threshold_neghborhood, media_threshold_neghborhood, medi
       pred_mediana.append(0)
       pred_tutti_verdi.append(0)
   
-  with open('./ConvAbuse/results_corr_FINAL2.txt', 'a') as f:
-    f.write('SOMMA \n')
+  with open('./ConvAbuse/results_ConvAbuse.txt', 'a') as f:
+    f.write('SUM \n')
     f.write(classification_report(test_df['disagreement'], [int(i>=somma_global_best_th) for i in pred_somma] ))
 
-    f.write('MEDIA \n')
+    f.write('MEAN \n')
     f.write(classification_report(test_df['disagreement'], [int(i>=media_global_best_th) for i in pred_media] ))
   
-    f.write('MEDIANA \n')
+    f.write('MEDIAN \n')
     f.write(classification_report(test_df['disagreement'], [int(i>=mediana_global_best_th) for i in pred_mediana] ))
   
-    f.write('VERDI \n')
+    f.write('MIN \n')
     f.write(classification_report(test_df['disagreement'], [int(i>=min_global_best_th) for i in pred_tutti_verdi] ))
 
   if threshold == somma_threshold_neghborhood:
@@ -241,6 +239,4 @@ for threshold in [somma_threshold_neghborhood, media_threshold_neghborhood, medi
     prediction_df['min'] = pred_tutti_verdi
     prediction_df['min_t'] = [int(i>=min_global_best_th) for i in pred_tutti_verdi]
 
-prediction_df.to_csv('predictions_df_ConvAbuse2.csv', index=False, sep='\t')
-
-
+prediction_df.to_csv('predictions_df_ConvAbuse.csv', index=False, sep='\t')
