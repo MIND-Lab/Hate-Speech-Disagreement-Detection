@@ -1,3 +1,29 @@
+##################################
+#  Requirements:
+#--------------------------------
+# The same code has been executed on all the dataset
+# The actual code refers to ConvAbuse. 
+# To execute on different data, adjust the data path.
+#
+# Training data should be in a folder named "Data"
+# Data paths can be specified at lines 47, 90
+# saving paths at lines 156 and 157 
+#--------------------------------
+#  What does the code do:
+#--------------------------------
+# Select all the tokens that satisfy the pos tagging requirements both from the
+# training and the test dataset, and compute their embeddings.
+# Computes the score for every element in the test dataset.
+# Saves initial temporary scores for the token in the test dataset (to
+# memorize the list of valid tokens) and the distances between each pair of
+# tokens (a csv file per instance). 
+#--------------------------------
+#  Notes:
+#--------------------------------
+# We selected 'bert-base-multilingual-cased', but we also provided code to 
+# execute with 'bert-base-uncased' at line 39
+##################################
+
 import warnings
 warnings.filterwarnings("ignore")
 from Utils import preprocessing,  pos_methods
@@ -15,7 +41,7 @@ model = BertModel.from_pretrained('bert-base-multilingual-cased', output_hidden_
 tokenizer = AutoTokenizer.from_pretrained("bert-base-multilingual-cased")
 
 
-# Train preprocessing: estrazioni degli embedding del dizionario
+# Train preprocessing
 train_df = pd.read_json("./Data/ConvAbuse_train.json", orient='index')
 train_df = preprocessing.get_dataset_labels(train_df)
 
@@ -60,7 +86,7 @@ for sentence in tqdm(list(train_df['original_text'])):
 print('len train:' + str(len(context_tokens)))
 
 #Load test, compute scores on test
-test_df = pd.read_json("/home/grizzi/phd/Disagreement_project/Data/ConvAbuse_test.json", orient='index')
+test_df = pd.read_json("./Data/ConvAbuse_test.json", orient='index')
 test_df = preprocessing.get_dataset_labels(test_df)
 
 scores_df_test = pd.DataFrame(columns=['token','#sample','sentence_label','score'])
