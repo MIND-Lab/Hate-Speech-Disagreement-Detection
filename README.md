@@ -1,4 +1,4 @@
-# Unraveling Disagreement Constituents in Hateful Speech
+# Hate Speech Disagreement Detection through Weighted Probability Functions of Contextualized Embeddings
 
 This repository contains the code developed for "Hate Speech Disagreement Detection through Weighted Probability
 Functions of Contextualized Embeddings". 
