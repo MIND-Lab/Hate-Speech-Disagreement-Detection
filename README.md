@@ -1,7 +1,6 @@
-# Hate Speech Disagreement Detection through Weighted Probability Functions of Contextualized Embeddings
+# Is a bunch of words enough to detect disagreement in hateful content?
 
-This repository contains the code developed for "Hate Speech Disagreement Detection through Weighted Probability.
-Functions of Contextualized Embeddings". 
+This repository contains the code developed for "Is a bunch of words enough to detect disagreement in hateful content?". 
 This repository contains several scripts to reproduce the results presented in the paper. 
 The scripts allow both to estimate the Constituent Disagreement Scores for each constituent in the training dataset and to estimate Sentence Disagreement Scores (SDS) according to the four proposed strategies: Sum, Mean, Median, and Minimum. 
 
