@@ -2,7 +2,7 @@
 
 This repository contains the code developed for "Is a bunch of words enough to detect disagreement in hateful content?". 
 This repository contains several scripts to reproduce the results presented in the paper. 
-The scripts allow both to estimate the Constituent Disagreement Scores for each constituent in the training dataset and to estimate Sentence Disagreement Scores (SDS) according to the four proposed strategies: Sum, Mean, Median, and Minimum. 
+The scripts allow to estimate the Disagreement Scores for each constituent in the training dataset and to estimate the final sentence label according to the four proposed strategies: Sum, Mean, Median, and Minimum. 
 
 ### Datasets
 The datasets are reserved for the participants of Task 11 @SemEval2023 on Learning with Disagreements (LeWiDi), 2nd edition. Please refer to the [paper](https://aclanthology.org/2023.semeval-1.314/) for additional information.
