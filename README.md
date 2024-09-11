@@ -1,4 +1,4 @@
-# Is a bunch of words enough to detect disagreement in hateful content?
+# Is a bunch of words enough to detect disagreement in hateful content? 
 
 This repository contains the code developed for "Is a bunch of words enough to detect disagreement in hateful content?". 
 This repository contains several scripts to reproduce the results presented in the paper. 
