@@ -20,3 +20,16 @@ The scripts allow to execute the entire procedure described in the paper and sho
   
 Before executing the above-described scripts, all requirements must be met. Installation can be fulfilled manually or via `pip install -r requirements.txt`.
 
+### Baselines Models
+Within the paper, the proposed approach has been compared with several basilines models:
+- **G-minimum** : the best approach presented in [Unraveling Disagreement Constituents in Hateful Speech](https://link.springer.com/chapter/10.1007/978-3-031-56066-8_3) ([code available for reproducidibility](https://github.com/MIND-Lab/Unrevealing-Disagreement-Constituents-in-Hateful-Speech))
+- **mBERT**: state-of-the-art model by [Devlin et al. (2018)](https://arxiv.org/abs/1810.04805) (Huggingface model `bert-base-multilingual-cased`)
+- **Llama-2**: state-of-the-art model by [Touvron et al. (2023)](https://arxiv.org/abs/2302.13971)  (Huggingface model `Llama-2-7b-chat-hf`)
+- **Mistral-7B**: state-of-the-art model by [Jiang et al., (2023)](https://arxiv.org/abs/2310.06825)  (Huggingface model `Mistral-7B-Instruct-v0.3`)
+- **Llama-3.2**: state-of-the-art model by [Dubey et al. (2024)](https://arxiv.org/abs/2407.21783)  (Huggingface model `Llama-3.2-3B-Instruct`)
+- **Phi-3.5**: state-of-the-art model by [Haider et al. (2024)](https://arxiv.org/abs/2404.14219)  (Huggingface model `Phi-3.5-mini-instruct`).
+
+The selected state-of-the-art baselines include generative LLMs. While mBERT has been fine-tuned for the classification task by concatenating a final classification layer, generative LLMs have been instruction-tuned to adapt their generative capabilities for the specific classification task.
+
+
+
