@@ -33,3 +33,16 @@ The selected state-of-the-art baselines include generative LLMs. While mBERT has
 
 
 
+## Citation
+If you found our work useful, please cite our papers:
+[Is a bunch of words enough to detect disagreement in hateful content?](https://aclanthology.org/2025.comedi-1.1/)
+
+```
+@inproceedings{rizzi2025bunch,
+  title={Is a bunch of words enough to detect disagreement in hateful content?},
+  author={Rizzi, Giulia and Rosso, Paolo and Fersini, Elisabetta},
+  booktitle={COLING 2025, Proceedings of Context and Meaning: Navigating Disagreements in NLP Annotation},
+  pages={1--11},
+  year={2025}
+}
+```
